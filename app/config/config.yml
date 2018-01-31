@@ -30,7 +30,8 @@ framework:
     assets: ~
     php_errors:
         log: true
-
+    serializer:
+        enabled: true
 # Twig Configuration
 twig:
     debug: '%kernel.debug%'
@@ -65,3 +66,25 @@ swiftmailer:
     username: '%mailer_user%'
     password: '%mailer_password%'
     spool: { type: memory }
+
+#Mongo db config
+doctrine_mongodb:
+    connections:
+        default:
+            server: "%mongodb_server%"
+            options: {}
+    default_database: "%mongodb_dbname%"
+    document_managers:
+        default:
+            auto_mapping: true
+
+fos_rest:
+    routing_loader:
+        include_format: false
+    exception:
+        enabled: true
+        messages:
+            'Symfony\Component\Security\Core\Exception\BadCredentialsException': true
+        codes:
+            'Symfony\Component\Security\Core\Exception\BadCredentialsException': 401
+        exception_controller: 'fos_rest.exception.controller:showAction'
