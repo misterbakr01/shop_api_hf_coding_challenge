@@ -27,7 +27,7 @@ class AuthTokenController extends Controller
             return $form;
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->get('doctrine_mongodb');
 
         $user = $em->getRepository('AppBundle:User')
             ->findOneByEmail($credentials->getLogin());
