@@ -11,4 +11,4 @@ parameters:
     mailer_password: null
     secret: ThisTokenIsNotSoSecretChangeItAhhOkIwill
     mongodb_server: "mongodb://localhost:27017"
-    mongodb_dbname: 'shops'
+    mongodb_dbname: shops

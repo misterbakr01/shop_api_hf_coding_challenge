@@ -13,7 +13,6 @@ use AppBundle\Form\Type\CredentialsType;
 use AppBundle\Entity\Credentials;
 use AppBundle\Document\User;
 use AppBundle\Document\AuthToken;
-use AppBundle\Document\Shop;
 
 class UserController extends Controller
 {

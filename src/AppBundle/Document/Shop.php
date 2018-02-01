@@ -3,7 +3,7 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(collection="shops")
  */
 class Shop
 {
@@ -16,6 +16,10 @@ class Shop
      * @MongoDB\Field(type="string")
      */
     public $email;
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    public $name;
 
     /**
      * @MongoDB\Field(type="string")
@@ -29,7 +33,11 @@ class Shop
      * @MongoDB\Field(type="hash")
      */
     public $location = array();
-
+     //
+    //  /**
+    //   * @MongoDB\ReferenceMany(targetDocument="LikedShop", mappedBy="shop")
+    //   */
+    //  public $liked;
 
     /**
      * Get id
@@ -61,6 +69,28 @@ class Shop
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string $name
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -128,4 +158,38 @@ class Shop
     {
         return $this->location;
     }
+    // public function __construct()
+    // {
+    //     //$this->liked = new \Doctrine\Common\Collections\ArrayCollection();
+    // }
+
+    // /**
+    //  * Add liked
+    //  *
+    //  * @param AppBundle\Document\LikedShop $liked
+    //  */
+    // public function addLiked(\AppBundle\Document\LikedShop $liked)
+    // {
+    //     $this->liked[] = $liked;
+    // }
+    //
+    // /**
+    //  * Remove liked
+    //  *
+    //  * @param AppBundle\Document\LikedShop $liked
+    //  */
+    // public function removeLiked(\AppBundle\Document\LikedShop $liked)
+    // {
+    //     $this->liked->removeElement($liked);
+    // }
+    //
+    // /**
+    //  * Get liked
+    //  *
+    //  * @return \Doctrine\Common\Collections\Collection $liked
+    //  */
+    // public function getLiked()
+    // {
+    //     return $this->liked;
+    // }
 }
