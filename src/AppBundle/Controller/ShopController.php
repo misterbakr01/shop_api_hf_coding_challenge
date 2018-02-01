@@ -31,7 +31,7 @@ class ShopController extends Controller
             throw $this->createNotFoundException('No shop found');
         }
 
-        return array($shops,$liked_shops,$disliked_shops);
+        return $shops;
     }
 
     /**
