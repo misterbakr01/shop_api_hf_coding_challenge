@@ -1,0 +1,19 @@
+AppBundle\Document\User:
+    attributes:
+        id:
+            groups: ['user', 'preference', 'user-token']
+        email:
+            groups: ['user', 'preference', 'user-token']
+        preferences:
+            groups: ['user']
+
+AppBundle\Document\AuthToken:
+    attributes:
+        id:
+            groups: ['user-token']
+        value:
+            groups: ['user-token']
+        createdAt:
+            groups: ['user-token']
+        userId:
+            groups: ['user-token']
