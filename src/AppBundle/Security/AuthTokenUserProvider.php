@@ -21,7 +21,14 @@ class AuthTokenUserProvider implements UserProviderInterface
 
     public function getAuthToken($authTokenHeader)
     {
-        return $this->authTokenRepository->findOneByValue($authTokenHeader);
+
+        $authToken =  $this->authTokenRepository->findOneByValue($authTokenHeader);
+        if($authToken){
+          $user = $this->userRepository->findOneById($authToken->getUserId());
+          $authToken->user = $user;
+        }
+
+        return $authToken;
     }
 
     public function loadUserByUsername($email)

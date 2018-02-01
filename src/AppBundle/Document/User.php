@@ -1,9 +1,11 @@
 <?php
 namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Symfony\Component\Security\Core\User\UserInterface;
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(collection="users")
  */
 class User implements UserInterface
 {
@@ -14,11 +16,14 @@ class User implements UserInterface
 
     /**
      * @MongoDB\Field(type="string")
+     * @Assert\NotBlank()
+     * @Assert\Email()
      */
     public $email;
 
     /**
      * @MongoDB\Field(type="string")
+     * @Assert\NotBlank()
      */
     public $password;
 
@@ -78,23 +83,23 @@ class User implements UserInterface
     }
 
     public function getRoles()
-{
-    return [];
-}
+    {
+        return [];
+    }
 
-public function getSalt()
-{
-    return null;
-}
+    public function getSalt()
+    {
+        return null;
+    }
 
-public function getUsername()
-{
-    return $this->email;
-}
+    public function getUsername()
+    {
+        return $this->email;
+    }
 
-public function eraseCredentials()
-{
-    // Suppression des données sensibles
-    $this->plainPassword = null;
-}
+    public function eraseCredentials()
+    {
+        // Suppression des données sensibles
+        $this->plainPassword = null;
+    }
 }

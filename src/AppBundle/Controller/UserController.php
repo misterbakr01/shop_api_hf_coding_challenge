@@ -8,152 +8,118 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
+use AppBundle\Form\Type\UserType;
+use AppBundle\Form\Type\CredentialsType;
+use AppBundle\Entity\Credentials;
 use AppBundle\Document\User;
-use AppBundle\Entity\AuthToken;
+use AppBundle\Document\AuthToken;
 use AppBundle\Document\Shop;
 
 class UserController extends Controller
 {
-
     /**
-     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"token"})
-     * @Rest\Get("/api/signup")
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user-token"})
+     * @Rest\Post("/api/signup")
      */
     public function signupAction(Request $request)
     {
 
       $user = new User();
+      $form = $this->createForm(UserType::class, $user);
 
-      $data = $request->request->all();
-      if (($request->request->method == "POST") && !empty($data)) {
-
-          $user->setEmail($data->email);
+      $form->submit($request->request->all());
+        if ($form->isValid()) {
+          $user->setEmail($user->getEmail());
           $encoder = $this->get('security.password_encoder');
-          // le mot de passe en claire est encodé avant la sauvegarde
-          $encoded = $encoder->encodePassword($user, $data->password);
+          $encoded = $encoder->encodePassword($user, $user->getPassword());
           $user->setPassword($encoded);
 
-          $em = $this->get('doctrine_mongodb');
-          $em->persist($user);
-          $em->flush();
+          $dm = $this->get('doctrine_mongodb')->getManager();
+          $dm->persist($user);
+          $dm->flush();
 
-          //Generate Token
           $authToken = new AuthToken();
           $authToken->setValue(base64_encode(random_bytes(50)));
           $authToken->setCreatedAt(new \DateTime('now'));
-          $authToken->setUser($user);
+          $authToken->setUserId($user->getId());
 
-          $em->persist($authToken);
-          $em->flush();
+          $dm->persist($authToken);
+          $dm->flush();
+          $result = $authToken;
 
-          return $authToken;
       } else {
-          return array('error' => 'errororr' );
+          $result = $form;
       }
+      return $result;
 
-
-      $dm = $this->get('doctrine_mongodb')->getManager();
-      $dm->persist($shop);
-      $dm->flush();
-
-        $apiKey = $request->query->get('apikey');
-        $credentials = new Credentials();
-        $form = $this->createForm(CredentialsType::class, $credentials);
-
-        $form->submit($request->request->all());
-
-        if (!$form->isValid()) {
-            return $form;
-        }
-
-        $em = $this->get('doctrine_mongodb');
-
-        $user = $em->getRepository('AppBundle:User')
-            ->findOneByEmail($credentials->getLogin());
-
-        if (!$user) { // L'utilisateur n'existe pas
-            return $this->invalidCredentials();
-        }
-
-        $encoder = $this->get('security.password_encoder');
-        $isPasswordValid = $encoder->isPasswordValid($user, $credentials->getPassword());
-
-        if (!$isPasswordValid) { // Le mot de passe n'est pas correct
-            return $this->invalidCredentials();
-        }
-
-        $authToken = new AuthToken();
-        $authToken->setValue(base64_encode(random_bytes(50)));
-        $authToken->setCreatedAt(new \DateTime('now'));
-        $authToken->setUser($user);
-
-        $em->persist($authToken);
-        $em->flush();
-
-        return $authToken;
     }
 
     /**
-     * @Rest\Get("/api/signin")
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user-token"})
+     * @Rest\Post("/api/signin")
      */
-    public function signinAction()
+    public function signinAction(Request $request)
     {
-        $shops = $this->get('doctrine_mongodb')
-            ->getRepository('AppBundle:Shop')
-            ->findAll();
+      $credentials = new Credentials();
+        $form = $this->createForm(CredentialsType::class, $credentials);
 
-        if (!$shops) {
-            throw $this->createNotFoundException('No shop found for id ');
-        }
-       $viewHandler = $this->get('fos_rest.view_handler');
+      $form->submit($request->request->all());
+      if ($form->isValid()) {
 
-       $view = View::create($shops);
-       $view->setFormat('json');
+          $user = $this->get('doctrine_mongodb')
+              ->getRepository('AppBundle:User')
+              ->findOneByEmail($credentials->getEmail());
 
-       return $viewHandler->handle($view);
+          if (!$user) {
+            return $this->invalidCredentials();
+          }
+          $encoder = $this->get('security.password_encoder');
+          $isPasswordValid = $encoder->isPasswordValid($user, $credentials->getPassword());
+
+          if (!$isPasswordValid) { // Le mot de passe n'est pas correct
+            return $this->invalidCredentials();
+          }
+
+          $authToken = new AuthToken();
+          $authToken->setValue(base64_encode(random_bytes(50)));
+          $authToken->setCreatedAt(new \DateTime('now'));
+          $authToken->setUserId($user->getId());
+          $dm = $this->get('doctrine_mongodb')->getManager();
+          $dm->persist($authToken);
+          $dm->flush();
+          $result = $authToken;
+
+      } else {
+          $result = $form;
+      }
+      return $result;
+    }
+
+    /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("/api/signout/{token}")
+     */
+    public function signoutAction(Request $request)
+    {
+      $dm = $this->get('doctrine_mongodb')->getManager();
+      $authToken = $dm->getRepository('AppBundle:AuthToken')
+                  ->findOneByValue($request->get('token'));
+      /* @var $authToken AuthToken */
+
+      $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+      // dump($authToken);
+      // dump($connectedUser);die;
+      if ($authToken && $authToken->user->getId() === $connectedUser->getId()) {
+          $dm->remove($authToken);
+          $dm->flush();
+      } else {
+          throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
+      }
     }
 
     private function invalidCredentials()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);
-    }
-    /**
-     * @Rest\Get("/api/create")
-     */
-    public function createAction()
-    {
-
-      $shop = new Shop();
-      $shop->setEmail('email33@mail.fr');
-      $shop->setPicture('http://placehold.it/150x150');
-      $shop->setCity('RABAT');
-      $shop->setLocation(array('type' => "point" , 'coordinates'=>[-6.74693, 33.83824]));
-
-
-      $dm = $this->get('doctrine_mongodb')->getManager();
-      $dm->persist($shop);
-      $dm->flush();
-
-      return new Response('Created shop id '.$shop->getId());
-    }
-
-    /**
-     * @Rest\Get("/api/show")
-     */
-    public function showAction()
-    {
-        $shops = $this->get('doctrine_mongodb')
-            ->getRepository('AppBundle:Shop')
-            ->findAll();
-
-        if (!$shops) {
-            throw $this->createNotFoundException('No shop found for id '.$id);
-        }
-
-        return new JsonResponse($shops);
     }
 
 }

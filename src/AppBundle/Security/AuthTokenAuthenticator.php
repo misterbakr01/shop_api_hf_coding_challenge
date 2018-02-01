@@ -64,15 +64,15 @@ class AuthTokenAuthenticator implements SimplePreAuthenticatorInterface, Authent
             throw new BadCredentialsException('Invalid authentication token');
         }
 
-        $user = $authToken->getUser();
+        $user = $authToken->user;
+      //  dump($user);die;
         $pre = new PreAuthenticatedToken(
             $user,
             $authTokenHeader,
             $providerKey,
-            $user->getRoles()
+            []
         );
 
-        // Nos utilisateurs n'ont pas de role particulier, on doit donc forcer l'authentification du token
         $pre->setAuthenticated(true);
 
         return $pre;

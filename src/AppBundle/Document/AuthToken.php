@@ -22,9 +22,9 @@ class AuthToken
     protected $createdAt;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User", mappedBy="user")
+     * @MongoDB\Field(type="string")
      */
-    protected $user;
+    protected $userId;
 
 
     public function getId()
@@ -57,13 +57,13 @@ class AuthToken
         $this->createdAt = $createdAt;
     }
 
-    public function getUser()
+    public function getUserId()
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser(User $user)
+    public function setUserId($userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 }
