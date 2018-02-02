@@ -4,7 +4,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
  * @MongoDB\Document(
- *   collection="dislikess",
+ *   collection="dislikes",
  *   indexes={
  *     @MongoDB\Index(keys={"createdAt"=1},options={"expireAfterSeconds"=7200})
  *   }
