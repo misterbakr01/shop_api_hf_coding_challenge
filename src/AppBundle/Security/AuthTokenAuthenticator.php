@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 class AuthTokenAuthenticator implements SimplePreAuthenticatorInterface, AuthenticationFailureHandlerInterface
 {
     /**
-    * Durée de validité du token en secondes, 12 heures
+    * token validation time, 12 hour
     */
     const TOKEN_VALIDITY_DURATION = 12 * 3600;
 
@@ -84,7 +84,7 @@ class AuthTokenAuthenticator implements SimplePreAuthenticatorInterface, Authent
     }
 
     /**
-    * Vérifie la validité du token
+    * Verify token validation
     */
     private function isTokenValid($authToken)
     {
@@ -93,7 +93,7 @@ class AuthTokenAuthenticator implements SimplePreAuthenticatorInterface, Authent
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        // Si les données d'identification ne sont pas correctes, une exception est levée
+        // retunn exeption if Toekn is invalid
         throw $exception;
     }
 }

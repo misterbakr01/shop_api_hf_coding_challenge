@@ -3,7 +3,7 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document(collection="shops")
+ * @MongoDB\Document(collection="shops",repositoryClass="AppBundle\Repository\ShopRepository")
  */
 class Shop
 {
@@ -39,6 +39,10 @@ class Shop
     //   */
     //  public $liked;
 
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    public $distance;
     /**
      * Get id
      *
@@ -128,13 +132,35 @@ class Shop
     }
 
     /**
-     * Get city
+     * Get distance
      *
      * @return string $city
      */
     public function getCity()
     {
         return $this->city;
+    }
+
+    /**
+     * Set distance
+     *
+     * @param string $distance
+     * @return $this
+     */
+    public function setDistance($distance)
+    {
+        $this->distance = $distance;
+        return $this;
+    }
+
+    /**
+     * Get distance
+     *
+     * @return string $distance
+     */
+    public function getDistance()
+    {
+        return $this->distance;
     }
 
     /**
@@ -158,38 +184,5 @@ class Shop
     {
         return $this->location;
     }
-    // public function __construct()
-    // {
-    //     //$this->liked = new \Doctrine\Common\Collections\ArrayCollection();
-    // }
 
-    // /**
-    //  * Add liked
-    //  *
-    //  * @param AppBundle\Document\LikedShop $liked
-    //  */
-    // public function addLiked(\AppBundle\Document\LikedShop $liked)
-    // {
-    //     $this->liked[] = $liked;
-    // }
-    //
-    // /**
-    //  * Remove liked
-    //  *
-    //  * @param AppBundle\Document\LikedShop $liked
-    //  */
-    // public function removeLiked(\AppBundle\Document\LikedShop $liked)
-    // {
-    //     $this->liked->removeElement($liked);
-    // }
-    //
-    // /**
-    //  * Get liked
-    //  *
-    //  * @return \Doctrine\Common\Collections\Collection $liked
-    //  */
-    // public function getLiked()
-    // {
-    //     return $this->liked;
-    // }
 }

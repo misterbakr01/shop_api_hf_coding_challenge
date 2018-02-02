@@ -44,12 +44,13 @@ class UserController extends Controller
 
           $dm->persist($authToken);
           $dm->flush();
-          $result = $authToken;
-
+          //$json = $this->serialize($authToken);
+          $response = new JsonResponse(array('success'=>true,'data' => $this->serialize($authToken)));
       } else {
-          $result = $form;
+          $response = new JsonResponse(array('success'=>false,'data' => $this->serialize($form)),Response::HTTP_BAD_REQUEST);
       }
-      return $result;
+
+      return $response;
 
     }
 
@@ -86,12 +87,13 @@ class UserController extends Controller
           $dm = $this->get('doctrine_mongodb')->getManager();
           $dm->persist($authToken);
           $dm->flush();
-          $result = $authToken;
-
+          $response = new JsonResponse(array('success'=> true,'data' => $this->serialize($authToken)));
       } else {
-          $result = $form;
+          $response = new JsonResponse(array('success'=> false,'data' => $this->serialize($form)));
       }
-      return $result;
+
+      //Response::HTTP_BAD_REQUEST
+      return $response;
     }
 
     /**
@@ -111,6 +113,7 @@ class UserController extends Controller
       if ($authToken && $authToken->user->getId() === $connectedUser->getId()) {
           $dm->remove($authToken);
           $dm->flush();
+          return new JsonResponse(array('success'=>true,'message' => "successfuly signout"));
       } else {
           throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
       }
@@ -118,7 +121,12 @@ class UserController extends Controller
 
     private function invalidCredentials()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(array('success'=>false,'errors' => ["Invalide Credentials"]),Response::HTTP_BAD_REQUEST);
     }
 
+    private function serialize($data)
+    {
+        return $this->container->get('jms_serializer')
+            ->toArray($data);
+    }
 }
