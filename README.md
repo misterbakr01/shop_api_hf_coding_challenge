@@ -8,12 +8,18 @@ Symfony Standard Edition
 
   * **mongodb extension** - http://php.net/manual/fr/mongodb.installation.manual.php
 
+
+
 * composer install
 
 * composer mongodb:build
 
 # Update indexes for your documents
 * php bin/console doctrine:mongodb:schema:update
+
+# Start server
+
+* php bin/console server:run
 
 
 ## APi Methods :
