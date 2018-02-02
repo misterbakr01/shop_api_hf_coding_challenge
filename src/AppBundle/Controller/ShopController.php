@@ -18,21 +18,56 @@ class ShopController extends Controller
      * @Rest\View()
      * @Rest\Get("/api/shops/nearby")
      */
-    public function shopsAction()
+    public function shopsAction(Request $request)
     {
-        $liked_shops = $this->preferredAction();
-        $disliked_shops = $this->dislikedAction();
+        $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+        $page = $request->get('page');
+        $page = $page - 1;
+        $skip = $page * 20;
+        $liked_ids = $this->getLikedShops($connectedUser);
+        $disliked_shops = $this->getDisLikedShops($connectedUser);
+        $exclude_ids = array_merge($liked_ids, $disliked_shops);
 
-        $shops = $this->get('doctrine_mongodb')
-            ->getRepository('AppBundle:Shop')
-            ->findAll();
+        $dm = $this->get('doctrine_mongodb')->getManager();
+        $shops = $dm->createQueryBuilder('AppBundle:Shop')->
+                 field('id')->notIn($exclude_ids)
+                 ->limit(20)
+                 ->skip($skip)
+                 ->getQuery()->execute();
 
         if (!$shops) {
-            throw $this->createNotFoundException('No shop found');
+            throw $this->createNotFoundException('No shop found---');
         }
 
         return $shops;
     }
+
+    private function getLikedShops($connectedUser)
+    {
+      $liked_shops = $this->get('doctrine_mongodb')
+          ->getRepository('AppBundle:LikedShop')
+          ->findByUserId($connectedUser->getId());
+
+      $liked_ids = [];
+      foreach ($liked_shops as $key => $value) {
+        $liked_ids[]=$value->getId();
+      }
+      return $liked_ids;
+    }
+
+    private function getDisLikedShops($connectedUser)
+    {
+      $disliked_shops = $this->get('doctrine_mongodb')
+          ->getRepository('AppBundle:DislikedShop')
+          ->findByUserId($connectedUser->getId());
+
+      $disliked_ids = [];
+      foreach ($disliked_shops as $key => $value) {
+        $liked_ids[]=$value->getId();
+      }
+      return $disliked_ids;
+    }
+
 
     /**
      * @Rest\View()
@@ -40,6 +75,7 @@ class ShopController extends Controller
      */
     public function preferredAction()
     {
+
         $liked_shops = $this->get('doctrine_mongodb')
             ->getRepository('AppBundle:LikedShop')
             ->findAll();
