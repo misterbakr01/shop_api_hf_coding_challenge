@@ -98,13 +98,13 @@ class UserController extends Controller
 
     /**
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
-     * @Rest\Delete("/api/signout/{token}")
+     * @Rest\Delete("/api/signout")
      */
     public function signoutAction(Request $request)
     {
       $dm = $this->get('doctrine_mongodb')->getManager();
       $authToken = $dm->getRepository('AppBundle:AuthToken')
-                  ->findOneByValue($request->get('token'));
+                  ->findOneByValue($request->headers->get('X-Auth-Token'));
       /* @var $authToken AuthToken */
 
       $connectedUser = $this->get('security.token_storage')->getToken()->getUser();

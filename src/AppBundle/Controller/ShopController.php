@@ -23,7 +23,8 @@ class ShopController extends Controller
     public function shopsAction(Request $request)
     {
         $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
-        $page = $request->get('page');
+        $page = ($request->get('page')) ? $request->get('page') : 1;
+
         $page = $page - 1;
         $skip = $page * 20;
         $liked_ids = $this->getLikedShops($connectedUser);
