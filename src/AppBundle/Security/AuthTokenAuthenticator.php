@@ -93,7 +93,7 @@ class AuthTokenAuthenticator implements SimplePreAuthenticatorInterface, Authent
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        // retunn exeption if Toekn is invalid
+        // retunn exeption if Token is invalid
         throw $exception;
     }
 }

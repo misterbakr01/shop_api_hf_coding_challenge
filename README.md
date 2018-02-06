@@ -1,48 +1,57 @@
-Symfony Standard Edition
-========================
+
 
 ## Prerequisites :
 --------------
 - php >= 7.0
 - mongodb ^3.x
+- **mongodb extension** - http://php.net/manual/fr/mongodb.installation.manual.php
 
-  * **mongodb extension** - http://php.net/manual/fr/mongodb.installation.manual.php
+1 . Clone the repository :
+  ```
+   $ git clone https://github.com/zfaty/shop_api_hf_coding_challenge.git shop_api
+   $ cd shop_api
+  ```
+2 . Install dependencies :
+  ```
+  $ composer install
+  ```
+3 . Build database & Update indexes for db documents
+  ```
+  $ composer mongodb:build
+  $ php bin/console doctrine:mongodb:schema:update
+  ```
 
+4 . Start the server
+  ```
+  $ php bin/console server:run
+  ```
 
-
-* composer install
-
-* composer mongodb:build
-
-# Update indexes for your documents
-* php bin/console doctrine:mongodb:schema:update
-
-# Start server
-
-* php bin/console server:run
-
-
-## APi Methods :
+====================================
+## API Doc :
 
 All Methods shoud be send with Headers :
-**Content-Type:application/json**
-**X-Auth-Token:___TOKEN___**
-
+```
+Content-Type:application/json
+X-Auth-Token:___TOKEN___
+```
  ** *Except signup and signin **
 
-# Create account
+### Create account
  * POST /api/signup   
 **Request :**
+
+```
  {
 	"email":"fzszes@mail.fr",
 	"password":{
 		"password":"ZADAZ1415SDFSDF5",
 		"confpassword":"ZADAZ1415SDFSDF5"
 	}
-
 }
+```
 
 **Response :**
+```
 {
     "success": true,
     "data": {
@@ -52,17 +61,22 @@ All Methods shoud be send with Headers :
         "user_id": "5a7490d9d2ccda0e7b318e9f"
     }
 }
+```
 
-# SignIN
+##"" SignIN
  * POST /api/signin  
 
  **Request :**
-{
-	"email":"fz@mail.fr",
-	"password":"ZADAZ1415SDFSDF5"
-}
+
+```
+  {
+  "email":"fz@mail.fr",
+  "password":"ZADAZ1415SDFSDF5"
+  }
+```
 
 **Response :**
+```
 {
     "success": true,
     "data": {
@@ -72,21 +86,24 @@ All Methods shoud be send with Headers :
         "user_id": "5a7318fed2ccda14b8423667"
     }
 }
-
-# Logout
+```
+### Logout
 
 * Delete /api/signout
 **Response :**
-{
-    "success": true,
-    "message": "successfuly signout"
-}
 
-# Get Shop list ordred by distance from connected user
+```
+  {
+      "success": true,
+      "message": "successfuly signout"
+  }
+```
+### Get Shop list ordred by distance from connected user
 
 * GET /api/shops/nearby?latitude=33.5781515&longitude=-7.627700099999999
 
 **Response :**
+```
 {
    "success": true,
    "data": [
@@ -108,18 +125,18 @@ All Methods shoud be send with Headers :
         ........
    ]
 }
-
-# Get preferred shop
+```
+### Get preferred shop
 GET /api/shops/preferred
 
-# Get preferred shop
+### Get disliked shop
 GET /api/shop/disliked
 
-# Like a shop
-POST /api/shop/like
+### Like a shop
+POST /api/shop/like/{shop_id}
 
-# unLike a shop
+### unLike a shop
 Delete /api/shop/unlike/{id}
 
-# disLike a shop
-POST /api/shop/dislike
+### disLike a shop
+POST /api/shop/dislike/{shop_id}
